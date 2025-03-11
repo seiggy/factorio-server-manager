@@ -54,8 +54,19 @@ func SetupModPacks(t *testing.T, empty bool, emptyMods bool) {
 
 func CleanupModPacks(t *testing.T) {
 	config := bootstrap.GetConfig()
-	err := os.RemoveAll(config.FactorioModPackDir)
-	assert.NoError(t, err, `Error removing directory %s`, config.FactorioModPackDir)
+	
+	// Safely remove contents instead of the directory itself
+	files, err := os.ReadDir(config.FactorioModPackDir)
+	if err != nil {
+		t.Fatalf("Error reading mod pack directory: %s", err)
+	}
+
+	for _, file := range files {
+		path := filepath.Join(config.FactorioModPackDir, file.Name())
+		if err := os.RemoveAll(path); err != nil {
+			t.Fatalf("Error removing file/directory %s: %s", path, err)
+		}
+	}
 }
 
 func UnknownModpackTest(t *testing.T, method string, baseRoute string, route string, handlerFunc http.HandlerFunc) {

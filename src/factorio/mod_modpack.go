@@ -226,18 +226,23 @@ func (modPack *ModPack) LoadModPack() error {
 	}
 	folderMode := fileInfo.Mode()
 
-	//clean factorio mod directory
-	err = os.RemoveAll(config.FactorioModsDir)
+	// Clean factorio mod directory by removing its contents instead of the directory itself
+	files, err := ioutil.ReadDir(config.FactorioModsDir)
 	if err != nil {
-		log.Printf("error on removing the factorio mods dir: %s", err)
+		log.Printf("error on reading the factorio mods dir: %s", err)
 		return err
 	}
 
-	err = os.Mkdir(config.FactorioModsDir, folderMode)
-	if err != nil {
-		log.Printf("error on recreating mod dir: %s", err)
-		return err
+	// Remove each file individually to preserve the directory structure
+	for _, file := range files {
+		path := filepath.Join(config.FactorioModsDir, file.Name())
+		if err := os.RemoveAll(path); err != nil {
+			log.Printf("error removing file/directory %s: %v", path, err)
+			return err
+		}
 	}
+
+	// No need to recreate the directory as we've preserved it
 
 	//copy the modpack folder to the normal mods directory
 	err = filepath.Walk(modPack.Mods.ModInfoList.Destination, func(path string, info os.FileInfo, err error) error {

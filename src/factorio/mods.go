@@ -33,18 +33,24 @@ func DeleteAllMods() error {
 
 	modsDirPerm := modsDirInfo.Mode().Perm()
 
-	err = os.RemoveAll(config.FactorioModsDir)
+	// Read all files/directories in the mods directory
+	files, err := ioutil.ReadDir(config.FactorioModsDir)
 	if err != nil {
-		log.Printf("removing FactorioModsDir failed: %s", err)
+		log.Printf("error reading FactorioModsDir: %s", err)
 		return err
 	}
 
-	err = os.Mkdir(config.FactorioModsDir, modsDirPerm)
-	if err != nil {
-		log.Printf("error recreating modPackDir: %s", err)
-		return err
+	// Remove each file/directory individually to preserve the directory structure
+	for _, file := range files {
+		path := filepath.Join(config.FactorioModsDir, file.Name())
+		if err := os.RemoveAll(path); err != nil {
+			log.Printf("error removing file/directory %s: %v", path, err)
+			return err
+		}
 	}
 
+	// No need to recreate the directory as we've preserved it
+	
 	return nil
 }
 

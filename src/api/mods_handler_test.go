@@ -104,9 +104,18 @@ func SetupMods(t *testing.T, empty bool) {
 
 func CleanupMods(t *testing.T) {
 	config := bootstrap.GetConfig()
-	err := os.RemoveAll(config.FactorioModsDir)
+	
+	// Safely remove contents instead of the directory itself
+	files, err := os.ReadDir(config.FactorioModsDir)
 	if err != nil {
-		t.Fatalf("Error removing dev directory: %s", err)
+		t.Fatalf("Error reading mods directory: %s", err)
+	}
+
+	for _, file := range files {
+		path := filepath.Join(config.FactorioModsDir, file.Name())
+		if err := os.RemoveAll(path); err != nil {
+			t.Fatalf("Error removing file/directory %s: %s", path, err)
+		}
 	}
 }
 
