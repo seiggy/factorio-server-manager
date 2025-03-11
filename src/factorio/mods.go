@@ -25,14 +25,7 @@ type LoginSuccessResponse struct {
 func DeleteAllMods() error {
 	var err error
 	config := bootstrap.GetConfig()
-	modsDirInfo, err := os.Stat(config.FactorioModsDir)
-	if err != nil {
-		log.Printf("error getting stats of FactorioModsDir: %s", err)
-		return err
-	}
-
-	modsDirPerm := modsDirInfo.Mode().Perm()
-
+	
 	// Read all files/directories in the mods directory
 	files, err := ioutil.ReadDir(config.FactorioModsDir)
 	if err != nil {

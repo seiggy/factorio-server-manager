@@ -218,14 +218,7 @@ func (modPackMap *ModPackMap) DeleteModPack(modPackName string) error {
 func (modPack *ModPack) LoadModPack() error {
 	var err error
 	config := bootstrap.GetConfig()
-	//get filemode, so it can be restored
-	fileInfo, err := os.Stat(config.FactorioModsDir)
-	if err != nil {
-		log.Printf("error on trying to save folder infos: %s", err)
-		return err
-	}
-	folderMode := fileInfo.Mode()
-
+	
 	// Clean factorio mod directory by removing its contents instead of the directory itself
 	files, err := ioutil.ReadDir(config.FactorioModsDir)
 	if err != nil {
