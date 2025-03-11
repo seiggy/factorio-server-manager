@@ -80,4 +80,4 @@ jobs:
           context: ./docker/
           file: ./docker/Dockerfile-local
           push: true
-          tags: ofsm/ofsm:${{ env.GITHUB_REF_SLUG }}
+          tags: seiggy/ofsm:${{ env.GITHUB_REF_SLUG }}
